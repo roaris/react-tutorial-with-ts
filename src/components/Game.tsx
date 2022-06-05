@@ -2,22 +2,23 @@ import { useState } from "react";
 import { Board } from "./Board";
 
 export const Game: React.FC = () => {
-  const [squares, setSquares] = useState<(string | null)[]>(
-    Array(9).fill(null)
-  );
+  const [history, setHistory] = useState<(string | null)[][]>([
+    Array(9).fill(null),
+  ]);
   const [xIsNext, setXIsNext] = useState<boolean>(true);
 
   const handleClick = (i: number) => {
-    if (calculateWinner() || squares[i]) {
+    const squares = history[history.length - 1];
+    if (calculateWinner(squares) || squares[i]) {
       return;
     }
     const newSquares = squares.slice();
     newSquares[i] = xIsNext ? "X" : "O";
-    setSquares(newSquares);
+    setHistory(history.concat([newSquares]));
     setXIsNext(!xIsNext);
   };
 
-  const calculateWinner = () => {
+  const calculateWinner = (squares: (string | null)[]) => {
     const lines = [
       [0, 1, 2],
       [3, 4, 5],
@@ -41,7 +42,8 @@ export const Game: React.FC = () => {
     return null;
   };
 
-  const winner = calculateWinner();
+  const squares = history[history.length - 1];
+  const winner = calculateWinner(squares);
   const status = winner
     ? "Winner: " + winner
     : "Next player: " + (xIsNext ? "X" : "O");
