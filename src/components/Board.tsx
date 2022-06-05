@@ -2,7 +2,7 @@ import { Square } from "./Square";
 
 export const Board: React.FC = () => {
   const renderSquare = (i: number) => {
-    return <Square />;
+    return <Square value={i} />;
   };
 
   const status = "Next player: X";

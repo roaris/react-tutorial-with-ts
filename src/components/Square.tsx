@@ -1,3 +1,3 @@
-export const Square: React.FC = () => {
-  return <button className="square"></button>;
+export const Square: React.FC<{ value: number }> = ({ value }) => {
+  return <button className="square">{value}</button>;
 };
