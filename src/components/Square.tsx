@@ -1,10 +1,11 @@
-import { useState } from "react";
+type SquareProps = {
+  value: string | null;
+  onClick: () => void;
+};
 
-export const Square: React.FC = () => {
-  const [value, setValue] = useState<string | null>(null);
-
+export const Square: React.FC<SquareProps> = ({ value, onClick }) => {
   return (
-    <button className="square" onClick={() => setValue("X")}>
+    <button className="square" onClick={onClick}>
       {value}
     </button>
   );
