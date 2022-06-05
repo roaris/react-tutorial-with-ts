@@ -42,6 +42,11 @@ export const Game: React.FC = () => {
     return null;
   };
 
+  const jump = (move: number) => {
+    setHistory(history.slice(0, move + 1));
+    setXIsNext(move % 2 === 0);
+  };
+
   const squares = history[history.length - 1];
   const winner = calculateWinner(squares);
   const status = winner
@@ -55,7 +60,17 @@ export const Game: React.FC = () => {
       </div>
       <div className="game-info">
         <div className="status">{status}</div>
-        <ol></ol>
+        <ol>
+          {history.map((_, move) => {
+            return (
+              <li key={move}>
+                <button onClick={() => jump(move)}>
+                  {move ? `Go to move #${move}` : "Go to game start"}
+                </button>
+              </li>
+            );
+          })}
+        </ol>
       </div>
     </div>
   );
