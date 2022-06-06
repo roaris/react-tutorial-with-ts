@@ -3,6 +3,7 @@ import { Board } from "./Board";
 
 export type History = {
   squares: (string | null)[];
+  step: number;
   position?: {
     x: number;
     y: number;
@@ -13,27 +14,42 @@ export const Game: React.FC = () => {
   const [history, setHistory] = useState<History>([
     {
       squares: Array(9).fill(null),
+      step: 0,
     },
   ]);
   const [xIsNext, setXIsNext] = useState<boolean>(true);
   const [currentStep, setCurrentStep] = useState<number>(0);
+  const [toggled, setToggled] = useState<boolean>(false);
 
   const handleClick = (i: number) => {
-    const squares = history[currentStep].squares;
+    let squares;
+    if (toggled) squares = history[history.length - 1 - currentStep].squares;
+    else squares = history[currentStep].squares;
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
     const newSquares = squares.slice();
     newSquares[i] = xIsNext ? "X" : "O";
-    const newHistory = history.slice(0, currentStep + 1);
-    newHistory.push({
+    const addValue = {
       squares: newSquares,
+      step: currentStep + 1,
       position: {
         x: Math.floor(i / 3) + 1,
         y: (i % 3) + 1,
       },
-    });
-    setHistory(newHistory);
+    };
+    if (toggled) {
+      const newHistory = history.slice(
+        history.length - currentStep - 1,
+        history.length
+      );
+      newHistory.unshift(addValue);
+      setHistory(newHistory);
+    } else {
+      const newHistory = history.slice(0, currentStep + 1);
+      newHistory.push(addValue);
+      setHistory(newHistory);
+    }
     setXIsNext(!xIsNext);
     setCurrentStep(currentStep + 1);
   };
@@ -62,25 +78,27 @@ export const Game: React.FC = () => {
     return null;
   };
 
-  const jump = (move: number) => {
-    setXIsNext(move % 2 === 0);
-    setCurrentStep(move);
+  const jump = (step: number) => {
+    setXIsNext(step % 2 === 0);
+    setCurrentStep(step);
   };
 
-  const squares = history[currentStep].squares;
+  let squares;
+  if (toggled) squares = history[history.length - 1 - currentStep].squares;
+  else squares = history[currentStep].squares;
   const winner = calculateWinner(squares);
   const status = winner
     ? "Winner: " + winner
     : "Next player: " + (xIsNext ? "X" : "O");
 
-  const moves = history.map((v, move) => {
-    const desc = move
-      ? `Go to move #${move} (${v.position!.x}, ${v.position!.y})`
+  const moves = history.map((v) => {
+    const desc = v.step
+      ? `Go to move #${v.step} (${v.position!.x}, ${v.position!.y})`
       : "Go to game start";
     return (
-      <li key={move}>
-        <button onClick={() => jump(move)}>
-          {move === currentStep ? (
+      <li key={v.step}>
+        <button onClick={() => jump(v.step)}>
+          {v.step === currentStep ? (
             <span style={{ fontWeight: "bold" }}>{desc}</span>
           ) : (
             desc
@@ -90,6 +108,13 @@ export const Game: React.FC = () => {
     );
   });
 
+  const toggle = () => {
+    const newHistory = history.slice();
+    newHistory.reverse();
+    setHistory(newHistory);
+    setToggled(!toggled);
+  };
+
   return (
     <div className="game">
       <div className="game-board">
@@ -97,6 +122,7 @@ export const Game: React.FC = () => {
       </div>
       <div className="game-info">
         <div className="status">{status}</div>
+        <button onClick={toggle}>toggle</button>
         <ol>{moves}</ol>
       </div>
     </div>
