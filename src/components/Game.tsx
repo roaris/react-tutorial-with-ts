@@ -1,20 +1,40 @@
 import { useState } from "react";
 import { Board } from "./Board";
 
+export type History = {
+  squares: (string | null)[];
+  position?: {
+    x: number;
+    y: number;
+  };
+}[];
+
 export const Game: React.FC = () => {
-  const [history, setHistory] = useState<(string | null)[][]>([
-    Array(9).fill(null),
+  const [history, setHistory] = useState<History>([
+    {
+      squares: Array(9).fill(null),
+    },
   ]);
   const [xIsNext, setXIsNext] = useState<boolean>(true);
 
   const handleClick = (i: number) => {
-    const squares = history[history.length - 1];
+    const squares = history[history.length - 1].squares;
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
     const newSquares = squares.slice();
     newSquares[i] = xIsNext ? "X" : "O";
-    setHistory(history.concat([newSquares]));
+    setHistory(
+      history.concat([
+        {
+          squares: newSquares,
+          position: {
+            x: Math.floor(i / 3) + 1,
+            y: (i % 3) + 1,
+          },
+        },
+      ])
+    );
     setXIsNext(!xIsNext);
   };
 
@@ -47,7 +67,7 @@ export const Game: React.FC = () => {
     setXIsNext(move % 2 === 0);
   };
 
-  const squares = history[history.length - 1];
+  const squares = history[history.length - 1].squares;
   const winner = calculateWinner(squares);
   const status = winner
     ? "Winner: " + winner
@@ -61,11 +81,13 @@ export const Game: React.FC = () => {
       <div className="game-info">
         <div className="status">{status}</div>
         <ol>
-          {history.map((_, move) => {
+          {history.map((v, move) => {
             return (
               <li key={move}>
                 <button onClick={() => jump(move)}>
-                  {move ? `Go to move #${move}` : "Go to game start"}
+                  {move
+                    ? `Go to move #${move} (${v.position!.x}, ${v.position!.y})`
+                    : "Go to game start"}
                 </button>
               </li>
             );
