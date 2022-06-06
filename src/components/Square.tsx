@@ -1,12 +1,29 @@
 type SquareProps = {
   value: string | null;
   onClick: () => void;
+  hilighted: boolean;
 };
 
-export const Square: React.FC<SquareProps> = ({ value, onClick }) => {
+export const Square: React.FC<SquareProps> = ({
+  value,
+  onClick,
+  hilighted,
+}) => {
   return (
-    <button className="square" onClick={onClick}>
-      {value}
-    </button>
+    <>
+      {hilighted ? (
+        <button
+          className="square"
+          onClick={onClick}
+          style={{ backgroundColor: "red" }}
+        >
+          {value}
+        </button>
+      ) : (
+        <button className="square" onClick={onClick}>
+          {value}
+        </button>
+      )}
+    </>
   );
 };

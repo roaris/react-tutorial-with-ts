@@ -3,11 +3,22 @@ import { Square } from "./Square";
 type BoardProps = {
   squares: (string | null)[];
   onClick: (i: number) => void;
+  hilightCell: number[];
 };
 
-export const Board: React.FC<BoardProps> = ({ squares, onClick }) => {
+export const Board: React.FC<BoardProps> = ({
+  squares,
+  onClick,
+  hilightCell,
+}) => {
   const renderSquare = (i: number) => {
-    return <Square value={squares[i]} onClick={() => onClick(i)} />;
+    return (
+      <Square
+        value={squares[i]}
+        onClick={() => onClick(i)}
+        hilighted={hilightCell.includes(i)}
+      />
+    );
   };
 
   return (

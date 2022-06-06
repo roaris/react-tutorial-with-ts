@@ -72,7 +72,7 @@ export const Game: React.FC = () => {
         squares[a] === squares[b] &&
         squares[b] === squares[c]
       ) {
-        return squares[a];
+        return [squares[a], a, b, c];
       }
     }
     return null;
@@ -86,10 +86,11 @@ export const Game: React.FC = () => {
   let squares;
   if (toggled) squares = history[history.length - 1 - currentStep].squares;
   else squares = history[currentStep].squares;
-  const winner = calculateWinner(squares);
-  const status = winner
-    ? "Winner: " + winner
+  const result = calculateWinner(squares);
+  const status = result
+    ? "Winner: " + result[0]
     : "Next player: " + (xIsNext ? "X" : "O");
+  const hilightCell = (result ? result.slice(1) : []) as number[];
 
   const moves = history.map((v) => {
     const desc = v.step
@@ -118,7 +119,11 @@ export const Game: React.FC = () => {
   return (
     <div className="game">
       <div className="game-board">
-        <Board squares={squares} onClick={(i) => handleClick(i)} />
+        <Board
+          squares={squares}
+          onClick={(i) => handleClick(i)}
+          hilightCell={hilightCell}
+        />
       </div>
       <div className="game-info">
         <div className="status">{status}</div>
