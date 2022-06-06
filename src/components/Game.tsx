@@ -16,26 +16,26 @@ export const Game: React.FC = () => {
     },
   ]);
   const [xIsNext, setXIsNext] = useState<boolean>(true);
+  const [currentStep, setCurrentStep] = useState<number>(0);
 
   const handleClick = (i: number) => {
-    const squares = history[history.length - 1].squares;
+    const squares = history[currentStep].squares;
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
     const newSquares = squares.slice();
     newSquares[i] = xIsNext ? "X" : "O";
-    setHistory(
-      history.concat([
-        {
-          squares: newSquares,
-          position: {
-            x: Math.floor(i / 3) + 1,
-            y: (i % 3) + 1,
-          },
-        },
-      ])
-    );
+    const newHistory = history.slice(0, currentStep + 1);
+    newHistory.push({
+      squares: newSquares,
+      position: {
+        x: Math.floor(i / 3) + 1,
+        y: (i % 3) + 1,
+      },
+    });
+    setHistory(newHistory);
     setXIsNext(!xIsNext);
+    setCurrentStep(currentStep + 1);
   };
 
   const calculateWinner = (squares: (string | null)[]) => {
@@ -63,15 +63,32 @@ export const Game: React.FC = () => {
   };
 
   const jump = (move: number) => {
-    setHistory(history.slice(0, move + 1));
     setXIsNext(move % 2 === 0);
+    setCurrentStep(move);
   };
 
-  const squares = history[history.length - 1].squares;
+  const squares = history[currentStep].squares;
   const winner = calculateWinner(squares);
   const status = winner
     ? "Winner: " + winner
     : "Next player: " + (xIsNext ? "X" : "O");
+
+  const moves = history.map((v, move) => {
+    const desc = move
+      ? `Go to move #${move} (${v.position!.x}, ${v.position!.y})`
+      : "Go to game start";
+    return (
+      <li key={move}>
+        <button onClick={() => jump(move)}>
+          {move === currentStep ? (
+            <span style={{ fontWeight: "bold" }}>{desc}</span>
+          ) : (
+            desc
+          )}
+        </button>
+      </li>
+    );
+  });
 
   return (
     <div className="game">
@@ -80,19 +97,7 @@ export const Game: React.FC = () => {
       </div>
       <div className="game-info">
         <div className="status">{status}</div>
-        <ol>
-          {history.map((v, move) => {
-            return (
-              <li key={move}>
-                <button onClick={() => jump(move)}>
-                  {move
-                    ? `Go to move #${move} (${v.position!.x}, ${v.position!.y})`
-                    : "Go to game start"}
-                </button>
-              </li>
-            );
-          })}
-        </ol>
+        <ol>{moves}</ol>
       </div>
     </div>
   );
