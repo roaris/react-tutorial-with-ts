@@ -89,6 +89,8 @@ export const Game: React.FC = () => {
   const result = calculateWinner(squares);
   const status = result
     ? "Winner: " + result[0]
+    : currentStep === 9
+    ? "Draw"
     : "Next player: " + (xIsNext ? "X" : "O");
   const hilightCell = (result ? result.slice(1) : []) as number[];
 
