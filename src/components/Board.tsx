@@ -12,21 +12,13 @@ export const Board: React.FC<BoardProps> = ({ squares, onClick }) => {
 
   return (
     <div>
-      <div className="board-row">
-        {renderSquare(0)}
-        {renderSquare(1)}
-        {renderSquare(2)}
-      </div>
-      <div className="board-row">
-        {renderSquare(3)}
-        {renderSquare(4)}
-        {renderSquare(5)}
-      </div>
-      <div className="board-row">
-        {renderSquare(6)}
-        {renderSquare(7)}
-        {renderSquare(8)}
-      </div>
+      {[0, 1, 2].map((i) => (
+        <div className="board-row" key={i}>
+          {[0, 1, 2].map((j) => (
+            <span key={j}>{renderSquare(3 * i + j)}</span>
+          ))}
+        </div>
+      ))}
     </div>
   );
 };
